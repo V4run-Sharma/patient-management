@@ -2,8 +2,8 @@ POST http://localhost:4000/patients/register
 Content-Type: application/json
 
 {
-  "name": "",
-  "email": "kim.smith@example.com",
+  "name": "Varun Sharma 3",
+  "email": "varun.sharma3@example.com",
   "address": "890 Pitt St",
   "dateOfBirth": "1999-01-01",
   "dateOfRegistration": "2025-01-01"

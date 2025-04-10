@@ -6,6 +6,7 @@ import org.vs.patientservice.dto.request.UpdatePatientRequestDto;
 import org.vs.patientservice.dto.response.PatientResponseDto;
 import org.vs.patientservice.exception.EmailAlreadyExistsException;
 import org.vs.patientservice.exception.PatientNotFoundException;
+import org.vs.patientservice.grpc.BillingServiceGrpcClient;
 import org.vs.patientservice.model.Patient;
 import org.vs.patientservice.repository.PatientRepo;
 import org.vs.patientservice.utils.PatientMapper;
@@ -17,9 +18,11 @@ import java.util.UUID;
 public class PatientService {
 
   private final PatientRepo patientRepo;
+  private final BillingServiceGrpcClient billingServiceGrpcClient;
 
-  public PatientService(PatientRepo patientRepo) {
+  public PatientService(PatientRepo patientRepo, BillingServiceGrpcClient billingServiceGrpcClient) {
     this.patientRepo = patientRepo;
+    this.billingServiceGrpcClient = billingServiceGrpcClient;
   }
 
   // Used stream API to convert List<Patient> to List<PatientResponseDto>
@@ -43,6 +46,12 @@ public class PatientService {
           createPatientRequestDto.getEmail() + " already exists");
     }
     Patient savedPatient = patientRepo.save(PatientMapper.convertToPatient(createPatientRequestDto));
+
+    billingServiceGrpcClient.createBillingAccount(
+        savedPatient.getId().toString(),
+        savedPatient.getName(),
+        savedPatient.getEmail()
+    );
 
     return PatientMapper.convertToPatientResponseDto(savedPatient);
   }
